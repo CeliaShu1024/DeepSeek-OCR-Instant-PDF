@@ -1,5 +1,60 @@
 # DeepSeek-OCR-Instant-PDF
-Quick python demo for processing pdf with DeepSeek-OCR and result normalization.
+Quick python demo for processing pdf with DeepSeek-OCR and result normalization. For the `.mmd` files obtained from DeepSeek-OCR, you can use the `mmdNormalizer.py` to transform it to the following json structure:
+
+```json
+{
+	"id": filename (without ".mmd"),
+	"sections":{
+		"section":{
+			"sid": incremental int,
+			"heading": "" | "heading content...",
+			"heading_level": int,
+			"contents": "" | [
+				"paragraph 1",
+				"paragraph 2",
+				...
+			]
+		},
+		...
+	}
+}
+```
+
+where `heading_level` refers to the last heading the program detects for this section. We also added an approach to enhance compatibility with multi-page pdf files. A sample input and output case is given:
+
+**Input**
+```markdown
+# Chapter 1
+Some text split by
+
+<--- Page Split --->
+
+page boundary.
+
+## Section 1.1
+More content here.
+```
+
+**Output JSON:**
+```json
+{
+  "id": "document",
+  "sections": [
+    {
+      "sid": 1,
+      "heading": "Chapter 1",
+      "heading_level": 1,
+      "contents": ["Some text split by page boundary."]
+    },
+    {
+      "sid": 2,
+      "heading": "Chapter 1: Section 1.1",
+      "heading_level": 2,
+      "contents": ["More content here."]
+    }
+  ]
+}
+```
 
 ## Prerequisites
 This is an application based on DeepSeek-OCR. Please follow the instructions on the official installation of [DeepSeek-OCR](https://github.com/deepseek-ai/DeepSeek-OCR).
@@ -234,38 +289,6 @@ python mmdNormalizer.py -p output/ -o normalized/
 |----------|-------------|
 | `-p, --path` | Input markdown file or directory |
 | `-o, --output` | Output directory (optional, defaults to input location) |
-
-**Input:**
-```markdown
-# Chapter 1
-Some text split by
-<--- Page Split --->
-page boundary.
-
-## Section 1.1
-More content here.
-```
-
-**Output JSON:**
-```json
-{
-  "id": "document",
-  "sections": [
-    {
-      "sid": 1,
-      "heading": "Chapter 1",
-      "heading_level": 1,
-      "contents": ["Some text split by page boundary."]
-    },
-    {
-      "sid": 2,
-      "heading": "Chapter 1: Section 1.1",
-      "heading_level": 2,
-      "contents": ["More content here."]
-    }
-  ]
-}
-```
 
 ---
 
